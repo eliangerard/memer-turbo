@@ -1,12 +1,5 @@
-import express, { Request, Response } from "express";
+import { bot } from "./services/client";
 
-const app = express();
-const PORT = process.env.PORT || 3000;
+const { client } = bot;
 
-app.get("/", (req: Request, res: Response) => {
-  res.send("¡Hola, mundo con Express y TypeScript!");
-});
-
-app.listen(PORT, () => {
-  console.log(`Servidor corriendo en el puerto ${PORT}`);
-});
+client.login(process.env.DISCORD_TOKEN);

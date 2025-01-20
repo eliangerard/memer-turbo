@@ -1,6 +1,14 @@
 {
   "dependencies": {
-    "express": "^4.21.2"
+    "cors": "^2.8.5",
+    "discord-speech-recognition": "^3.4.1",
+    "discord.js": "^14.17.3",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "http": "^0.0.1-security",
+    "musicard": "^2.0.5",
+    "riffy": "^1.0.7-rc.2",
+    "socket.io": "^4.8.1"
   },
   "scripts": {
     "build": "tsc",

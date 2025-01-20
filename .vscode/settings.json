@@ -4,5 +4,6 @@
     "editor.codeActionsOnSave": {
         "source.fixAll.eslint": "explicit"
     },
-    "prettier.endOfLine": "auto"
+    "prettier.endOfLine": "auto",
+    "prettier.trailingComma": "all"
 }

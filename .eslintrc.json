@@ -1,17 +1,22 @@
 {
-    "extends": [
-      "eslint:recommended",
-      "plugin:@typescript-eslint/recommended",
-      // Otras configuraciones que uses...
-      "plugin:prettier/recommended"
-    ],
-    "plugins": [
-      "@typescript-eslint",
-      "prettier"
-    ],
-    "rules": {
-      "prettier/prettier": "error",
-      "semi-spacing": ["error", { "before": false, "after": true }]
-    }
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    // Otras configuraciones que uses...
+    "plugin:prettier/recommended"
+  ],
+  "plugins": [
+    "@typescript-eslint",
+    "prettier"
+  ],
+  "rules": {
+    "prettier/prettier": "error",
+    "semi-spacing": [
+      "error",
+      {
+        "before": false,
+        "after": true
+      }
+    ]
   }
-  
+}
