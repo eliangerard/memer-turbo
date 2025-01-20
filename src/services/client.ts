@@ -48,7 +48,9 @@ console.log(commandFiles);
 
 commandFiles.forEach((file) => {
   const filePath = path.join(__dirname, "../" + file);
-  const { default: command }: { default: Command } = require(filePath);
+  const { default: command }: { default: Command } = require(
+    filePath.includes("dist") ? filePath.replace(".ts", ".js") : filePath,
+  );
   commands.set(command.data.name, command);
 });
 
@@ -66,8 +68,8 @@ export const bot: Bot = {
 addSpeechEvent(bot.client);
 
 const eventsPath = path.join(__dirname, "../events/discord");
-const eventFiles = readdirSync(eventsPath).filter((file) =>
-  file.endsWith(".ts"),
+const eventFiles = readdirSync(eventsPath).filter(
+  (file) => file.endsWith(".ts") || file.endsWith(".js"),
 );
 
 eventFiles.forEach((file) => {
@@ -84,8 +86,8 @@ eventFiles.forEach((file) => {
 });
 
 const riffyPath = path.join(__dirname, "../events/riffy");
-const riffyEvents = readdirSync(riffyPath).filter((file) =>
-  file.endsWith(".ts"),
+const riffyEvents = readdirSync(riffyPath).filter(
+  (file) => file.endsWith(".ts") || file.endsWith(".js"),
 );
 
 riffyEvents.forEach((file) => {
