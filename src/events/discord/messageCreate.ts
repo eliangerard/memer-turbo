@@ -93,7 +93,7 @@ export default {
         await message
           .reply({ embeds: [embed], components: actionRows ?? undefined })
           .then((msg) => {
-            if (deleteResponse) setTimeout(() => msg.delete(), 15000);
+            setTimeout(() => msg.delete(), 15000);
           });
       else {
         await message.channel
