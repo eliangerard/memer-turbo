@@ -5,7 +5,6 @@ import {
   TextChannel,
 } from "discord.js";
 import { Classic } from "musicard";
-import { CommandExecute } from "../../../types/Command";
 import { bot } from "../../services/client";
 
 export default {
