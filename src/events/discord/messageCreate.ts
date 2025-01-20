@@ -73,7 +73,7 @@ export default {
 
       if (!!content)
         return await message.channel.send(content).then((msg) => {
-          if (deleteResponse) setTimeout(() => msg.delete(), 15000);
+          setTimeout(() => msg.delete(), 15000);
         });
 
       const embed = new EmbedBuilder()
