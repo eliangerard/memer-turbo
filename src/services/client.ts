@@ -14,7 +14,6 @@ import path from "path";
 import { readdirSync } from "fs";
 import { Command } from "../../types/Command";
 import { Bot } from "../../types/Bot";
-import { getRGBfromHEX } from "../helpers/getRGBfromHEX";
 
 const node: LavalinkNode = {
   host: process.env.LAVALINK_HOST ?? "localhost",
