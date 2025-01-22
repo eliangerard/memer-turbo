@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "cohere-ai": "^7.15.4",
     "cors": "^2.8.5",
     "discord-speech-recognition": "^3.4.1",
     "discord.js": "^14.17.3",
