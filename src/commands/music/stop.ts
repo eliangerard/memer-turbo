@@ -19,11 +19,11 @@ export default {
 
     if (!player) return;
 
+    player.queue.clear();
     player.stop();
 
     return {
-      title: "Detenido",
-      description: "Se ha detenido la reproducción",
+      noResponse: true,
     };
   },
 };

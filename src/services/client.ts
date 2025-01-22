@@ -6,6 +6,7 @@ import {
   Collection,
   ColorResolvable,
   GatewayDispatchEvents,
+  GatewayIntentBits,
 } from "discord.js";
 import { LavalinkNode, Riffy } from "riffy";
 import { addSpeechEvent } from "discord-speech-recognition";
@@ -24,12 +25,12 @@ const node: LavalinkNode = {
 
 const client = new Client({
   intents: [
-    "Guilds",
-    "GuildMessages",
-    "GuildVoiceStates",
-    "GuildMessageReactions",
-    "MessageContent",
-    "DirectMessages",
+    GatewayIntentBits.GuildVoiceStates,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.MessageContent,
+    GatewayIntentBits.GuildMessageReactions,
+    GatewayIntentBits.DirectMessages,
   ],
 });
 
@@ -53,6 +54,7 @@ commandFiles.forEach((file) => {
   );
   commands.set(command.data.name, command);
 });
+addSpeechEvent(client);
 
 export const bot: Bot = {
   client,
@@ -63,9 +65,8 @@ export const bot: Bot = {
   accentColor: (process.env.DISCORD_BOT_ACCENT_COLOR ??
     "#9c9c9c") as ColorResolvable,
   autoPlay: false,
+  previous: [],
 };
-
-addSpeechEvent(bot.client);
 
 const eventsPath = path.join(__dirname, "../events/discord");
 const eventFiles = readdirSync(eventsPath).filter(

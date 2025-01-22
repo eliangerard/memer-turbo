@@ -4,6 +4,7 @@ import {
   OmitPartialGroupDMChannel,
 } from "discord.js";
 import { bot } from "../../services/client";
+import { Filters } from "riffy";
 
 export default {
   data: new SlashCommandBuilder()
@@ -43,9 +44,9 @@ export default {
 
     if (!player) return;
 
-    const [filter] = content;
+    const [initialFilter] = content;
 
-    if (filter === "clear") {
+    if (initialFilter === "clear") {
       player.filters.setKaraoke(false);
       player.filters.setTimescale(false);
       player.filters.setTremolo(false);
@@ -66,7 +67,7 @@ export default {
       };
     }
 
-    if (filter === "list") {
+    if (initialFilter === "list") {
       return {
         title: "Filtros",
         description:
@@ -87,7 +88,7 @@ export default {
       };
     }
 
-    switch (filter) {
+    switch (initialFilter) {
       case "karaoke":
         player.filters.setKaraoke(!player.filters.karaoke);
         break;
@@ -134,9 +135,11 @@ export default {
         };
     }
 
+    const filter = initialFilter as unknown as Filters;
+
     return {
       title: "Filtros",
-      description: `Filtro ${filter} ? "activado" : "desactivado"}`,
+      description: `Filtro ${filter} ${player.filters[filter as unknown as keyof Filters] ? "activado" : "desactivado"}`,
     };
   },
 };

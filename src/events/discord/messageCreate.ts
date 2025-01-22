@@ -28,7 +28,8 @@ export default {
       return;
     }
 
-    if (command.deleteInvocation) setTimeout(() => message.delete(), 15000);
+    if (command.deleteInvocation != false)
+      setTimeout(() => message.delete(), 15000);
 
     if (!message.guild)
       return message.reply(
