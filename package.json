@@ -8,6 +8,7 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "http": "^0.0.1-security",
+    "mongoose": "^8.9.5",
     "musicard": "^2.0.5",
     "riffy": "^1.0.7-rc.2",
     "socket.io": "^4.8.1"

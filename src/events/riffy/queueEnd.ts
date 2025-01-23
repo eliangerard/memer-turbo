@@ -1,10 +1,13 @@
 import { EmbedBuilder, TextChannel } from "discord.js";
 import { Player } from "riffy";
 import { bot } from "../../services/client";
+import { io } from "../../services/socket";
 
 export default {
   name: "queueEnd",
   async execute(player: Player) {
+    io.emit("queueUpdate", []);
+
     const channel =
       (bot.client.channels.cache.get(player.textChannel) as TextChannel) ?? "";
 

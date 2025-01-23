@@ -1,10 +1,12 @@
 import { Player, Track } from "riffy";
 import { bot } from "../../services/client";
+import { io } from "../../services/socket";
 
 export default {
   name: "trackEnd",
   execute: async (player: Player, track: Track) => {
-    console.log("adding to previous", track.info.uri);
+    io.emit("queueUpdate", [player.current, ...player.queue]);
+
     const previous = bot.previous.find(
       (song) => song.guildId === player.guildId,
     );
