@@ -17,7 +17,7 @@ export default {
 
     const player = bot.riffy.players.get(message.guild.id);
 
-    if (!player) return;
+    if (!player) return { title: "No estoy en ningún canal de voz" };
 
     player.disconnect();
     player.destroy();
