@@ -46,8 +46,11 @@ export default {
       }
 
       if (player.current)
-        io.emit("queueUpdate", [player.current, ...player.queue]);
-      else io.emit("queueUpdate", player.queue);
+        io.to(player.guildId).emit("queueUpdate", [
+          player.current,
+          ...player.queue,
+        ]);
+      else io.to(player.guildId).emit("queueUpdate", player.queue);
       if (!player.playing && !player.paused) player.play();
       return {
         content: `Se añadieron \`${tracks.length} canciones\` desde \`${playlistInfo?.name}\``,
@@ -61,8 +64,11 @@ export default {
 
       player.queue.add(track);
       if (player.current)
-        io.emit("queueUpdate", [player.current, ...player.queue]);
-      else io.emit("queueUpdate", player.queue);
+        io.to(player.guildId).emit("queueUpdate", [
+          player.current,
+          ...player.queue,
+        ]);
+      else io.to(player.guildId).emit("queueUpdate", player.queue);
       if (!player.playing && !player.paused) player.play();
       console.log(track);
       if (!track?.info?.requester?.id)

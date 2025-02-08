@@ -111,7 +111,7 @@ router.post(
       io.to(message?.guildId ?? "").emit("command", {
         executed: false,
         error: "No se está reproduciendo nada",
-        queue,
+        queue: [],
       });
       message.channel.send({ embeds: [embed] }).then((msg) => {
         setTimeout(() => msg.delete(), 15000);
@@ -141,9 +141,11 @@ router.post(
     });
     const executed = await log.save();
 
+    const completeQueue = [player.current, ...queue];
+
     io.to(message?.guildId ?? "").emit("command", {
       executed,
-      queue,
+      queue: completeQueue,
     });
 
     if (noResponse) {

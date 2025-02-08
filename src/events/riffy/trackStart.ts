@@ -7,7 +7,10 @@ import { io } from "../../services/socket";
 export default {
   name: "trackStart",
   execute: async (player: Player, track: Track) => {
-    io.emit("queueUpdate", [player.current, ...player.queue]);
+    io.to(player.guildId).emit("queueUpdate", [
+      player.current,
+      ...player.queue,
+    ]);
 
     const channel =
       (bot.client.channels.cache.get(player.textChannel) as TextChannel) ??

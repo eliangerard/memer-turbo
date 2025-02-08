@@ -6,7 +6,7 @@ import { io } from "../../services/socket";
 export default {
   name: "queueEnd",
   async execute(player: Player) {
-    io.emit("queueUpdate", []);
+    io.to(player.guildId).emit("queueUpdate", []);
 
     const channel =
       (bot.client.channels.cache.get(player.textChannel) as TextChannel) ?? "";
