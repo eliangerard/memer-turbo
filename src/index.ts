@@ -9,6 +9,10 @@ import cors from "cors";
 
 const { client } = bot;
 
+const corsOptions = {
+  origin: "https://localhost:5173",
+};
+
 connection
   .then(() => {
     console.log("DB: Connected to database");
@@ -17,7 +21,7 @@ connection
     console.error("DB: " + err);
   });
 
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(router);
 app.use(auth);
 app.use(music);
