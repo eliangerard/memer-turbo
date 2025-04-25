@@ -15,6 +15,7 @@ export default {
         .setDescription("La canción que vas a quitar")
         .setRequired(true),
     ),
+  alias: ["rm"],
   inVoice: true,
   voiceCommand: ["quita la canción", "quita", "elimina"],
   queueDependent: true,
@@ -28,22 +29,29 @@ export default {
 
     if (!player) return;
 
-    if (content[0]) return;
+    const toRemove = Number(content.shift());
 
-    const song = Number(content[0]);
+    if (toRemove === null) {
+      return {
+        title: "Remove",
+        description: "Debes proporcionar una posición.",
+      };
+    }
 
-    if (song < 1 || song > player.queue.size) {
+    const queue = player.queue;
+
+    if (toRemove < 1 || toRemove > queue.length) {
       return {
         title: "Error",
         description: "La canción no existe",
       };
     }
 
-    const removedSong = player.queue.remove(song - 1);
+    const removedSong = queue.remove(toRemove - 1);
 
     return {
       title: "Canción eliminada",
-      description: `La canción #${song} - ${removedSong.info.title} ha sido removida de la lista.`,
+      description: `La canción #${toRemove} - ${removedSong.info.title} ha sido removida de la lista.`,
     };
   },
 };
