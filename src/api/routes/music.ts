@@ -5,6 +5,7 @@ import { Track } from "../../../types/Track";
 import Command from "../../models/Command";
 import { bot } from "../../services/client";
 import { Guild } from "discord.js";
+import { findUserVoiceGuild } from "../../helpers/findUserVoiceGuild";
 
 const music = express.Router();
 
@@ -36,7 +37,6 @@ music.get(
   "/servers",
   verifySession,
   async (req: CustomRequest, res: Response) => {
-    console.log(req.user);
     const botServers = await bot.client.guilds.fetch();
     const userServers = await fetch(
       "https://discord.com/api/users/@me/guilds",
@@ -50,8 +50,11 @@ music.get(
     const similarServers = botServers.filter((server) =>
       userServers?.some((userServer: Guild) => userServer.id === server.id),
     );
-
-    res.json(toObject(similarServers));
+    const guildId = await findUserVoiceGuild(req.user.id);
+    res.json({
+      servers: toObject(similarServers),
+      currentServer: guildId ? guildId : null,
+    });
   },
 );
 
