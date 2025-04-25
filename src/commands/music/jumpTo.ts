@@ -7,7 +7,7 @@ import { bot } from "../../services/client";
 
 export default {
   data: new SlashCommandBuilder()
-    .setName("jt")
+    .setName("jumpTo")
     .setDescription(
       "Salta a una canción en la lista y la canción actual se reproduce en seguida",
     )
@@ -17,6 +17,7 @@ export default {
         .setDescription("Canción a la que saltar")
         .setRequired(true),
     ),
+  alias: ["jt"],
   inVoice: false,
   voiceCommand: ["saltar", "salta"],
   queueDependent: true,
