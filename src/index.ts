@@ -10,7 +10,11 @@ import cors from "cors";
 const { client } = bot;
 
 const corsOptions = {
-  origin: "https://localhost:5173",
+  origin: [
+    "https://localhost:5173",
+    "https://staging.memer.live",
+    "https://memer.live",
+  ],
 };
 
 connection
