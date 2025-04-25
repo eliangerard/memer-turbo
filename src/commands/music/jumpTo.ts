@@ -7,7 +7,7 @@ import { bot } from "../../services/client";
 
 export default {
   data: new SlashCommandBuilder()
-    .setName("jumpTo")
+    .setName("jumpto")
     .setDescription(
       "Salta a una canción en la lista y la canción actual se reproduce en seguida",
     )
@@ -35,7 +35,7 @@ export default {
 
     if (to === null) {
       return {
-        title: "JumpTo",
+        title: "Jump To",
         description: "Debes proporcionar una posición.",
       };
     }
@@ -45,7 +45,7 @@ export default {
 
     if (to < 1 || to > queue.length) {
       return {
-        title: "JumpTo",
+        title: "Jump To",
         description: "La posición debe estar dentro del rango de la cola.",
       };
     }
@@ -56,7 +56,7 @@ export default {
     player.stop();
 
     return {
-      title: "JumpTo",
+      title: "Jump To",
       description: `Se saltó a la canción #${to}`,
     };
   },
