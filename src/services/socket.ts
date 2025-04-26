@@ -18,7 +18,10 @@ io.on("connection", (socket) => {
     console.log("joining room", guildId);
     socket.join(guildId);
   });
-
+  socket.on("register", (userId: string) => {
+    socket.join(userId); // Unir al usuario a su sala personal
+    console.log(`Usuario ${userId} registrado en socket ${socket.id}`);
+  });
   socket.on("leave", (guildId) => {
     console.log("leaving room", guildId);
     socket.leave(guildId);
