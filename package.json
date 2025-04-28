@@ -11,7 +11,8 @@
     "mongoose": "^8.9.5",
     "musicard": "^2.0.5",
     "riffy": "^1.0.7-rc.2",
-    "socket.io": "^4.8.1"
+    "socket.io": "^4.8.1",
+    "yt-search": "^2.12.1"
   },
   "scripts": {
     "build": "tsc",
@@ -23,6 +24,7 @@
     "@eslint/js": "^9.18.0",
     "@types/express": "^5.0.0",
     "@types/node": "^22.10.7",
+    "@types/yt-search": "^2.10.3",
     "@typescript-eslint/eslint-plugin": "^8.20.0",
     "@typescript-eslint/parser": "^8.20.0",
     "eslint": "^9.18.0",
