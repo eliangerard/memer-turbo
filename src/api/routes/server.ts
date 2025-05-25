@@ -23,9 +23,14 @@ try {
       let command = bot.commands.get(commandCalled);
 
       if (!command)
-        command = bot.commands.find(
-          (cmd) => cmd.alias && cmd.alias.includes(commandCalled),
-        );
+        command =
+          bot.commands.find(
+            (cmd) => cmd.alias && cmd.alias.includes(commandCalled),
+          ) ||
+          bot.commands.find(
+            (cmd) =>
+              cmd.voiceCommand && cmd.voiceCommand.includes(commandCalled),
+          );
 
       if (!command) {
         console.log("No se encontró el comando");
