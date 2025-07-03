@@ -16,12 +16,20 @@ import { readdirSync } from "fs";
 import { Command } from "../../types/Command";
 import { Bot } from "../../types/Bot";
 
-const node: LavalinkNode = {
-  host: process.env.LAVALINK_HOST ?? "localhost",
-  password: process.env.LAVALINK_PASSWORD ?? "",
-  port: Number(process.env.LAVALINK_PORT) ?? 2333,
-  secure: process.env.LAVALINK_SECURE === "true",
-};
+const node: LavalinkNode[] = [
+  {
+    host: process.env.LAVALINK_HOST1 ?? "localhost",
+    password: process.env.LAVALINK_PASSWORD1 ?? "",
+    port: Number(process.env.LAVALINK_PORT1) ?? 2333,
+    secure: process.env.LAVALINK_SECURE1 === "true",
+  },
+  {
+    host: process.env.LAVALINK_HOST2 ?? "localhost",
+    password: process.env.LAVALINK_PASSWORD2 ?? "",
+    port: Number(process.env.LAVALINK_PORT2) ?? 2333,
+    secure: process.env.LAVALINK_SECURE2 === "true",
+  },
+];
 
 const client = new Client({
   intents: [
@@ -34,13 +42,14 @@ const client = new Client({
   ],
 });
 
-const riffy = new Riffy(client, [node], {
+const riffy = new Riffy(client, node, {
   send: (payload) => {
     const guild = client.guilds.cache.get(payload.d.guild_id);
     if (guild) guild.shard.send(payload);
   },
   defaultSearchPlatform: process.env.SEARCH_PLATFORM,
   restVersion: "v4",
+  bypassChecks: { nodeFetchInfo: false },
 });
 
 const commands = new Collection<string, Command>();
