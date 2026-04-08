@@ -192,4 +192,67 @@ try {
   console.log(error);
 }
 
+// --- Lavalink diagnostics (no auth required, remove in production) ---
+router.get("/debug/lavalink", async (_req, res: Response) => {
+  try {
+    const results: Record<string, unknown> = {};
+
+    for (const [name, node] of (bot.riffy as any).nodeMap) {
+      const sessionId = node.sessionId ?? null;
+      const connected = node.connected ?? false;
+      const restBase = `http${node.secure ? "s" : ""}://${node.host}:${node.port}`;
+      const headers = {
+        Authorization: node.password,
+        "Content-Type": "application/json",
+      };
+
+      let info: unknown = null;
+      let players: unknown = null;
+
+      try {
+        const infoRes = await fetch(`${restBase}/v4/info`, { headers });
+        info = await infoRes.json();
+      } catch (e) {
+        info = { error: String(e) };
+      }
+
+      if (sessionId) {
+        try {
+          const playersRes = await fetch(
+            `${restBase}/v4/sessions/${sessionId}/players`,
+            { headers },
+          );
+          players = await playersRes.json();
+        } catch (e) {
+          players = { error: String(e) };
+        }
+      } else {
+        players = "no sessionId yet";
+      }
+
+      // In-memory riffy player states
+      const riffyPlayers: Record<string, unknown> = {};
+      for (const [guildId, player] of (bot.riffy as any).players) {
+        const conn = player.connection;
+        riffyPlayers[guildId] = {
+          playing: player.playing,
+          paused: player.paused,
+          connected: player.connected,
+          voiceChannel: player.voiceChannel,
+          current: player.current?.info?.title ?? null,
+          queueLength: player.queue?.length ?? 0,
+          voice: conn?.voice ?? null,
+          connectionSessionId: conn?.sessionId ?? null,
+        };
+      }
+
+      results[name] = { connected, sessionId, info, players, riffyPlayers };
+    }
+
+    res.json(results);
+  } catch (e) {
+    res.status(500).json({ error: String(e) });
+  }
+});
+
 export { router };

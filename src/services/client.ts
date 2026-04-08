@@ -8,7 +8,7 @@ import {
   GatewayDispatchEvents,
   GatewayIntentBits,
 } from "discord.js";
-import { LavalinkNode, Riffy } from "riffy";
+import { LavalinkNode, Riffy, RiffyEventType, Player, Track } from "riffy";
 import { addSpeechEvent } from "discord-speech-recognition";
 import { getFiles } from "../helpers/getFiles";
 import path from "path";
@@ -16,20 +16,12 @@ import { readdirSync } from "fs";
 import { Command } from "../../types/Command";
 import { Bot } from "../../types/Bot";
 
-const node: LavalinkNode[] = [
-  {
-    host: process.env.LAVALINK_HOST1 ?? "localhost",
-    password: process.env.LAVALINK_PASSWORD1 ?? "",
-    port: Number(process.env.LAVALINK_PORT1) ?? 2333,
-    secure: process.env.LAVALINK_SECURE1 === "true",
-  },
-  {
-    host: process.env.LAVALINK_HOST2 ?? "localhost",
-    password: process.env.LAVALINK_PASSWORD2 ?? "",
-    port: Number(process.env.LAVALINK_PORT2) ?? 2333,
-    secure: process.env.LAVALINK_SECURE2 === "true",
-  },
-];
+const node: LavalinkNode = {
+  host: process.env.LAVALINK_HOST ?? "localhost",
+  password: process.env.LAVALINK_PASSWORD ?? "",
+  port: Number(process.env.LAVALINK_PORT) ?? 2333,
+  secure: process.env.LAVALINK_SECURE === "true",
+};
 
 const client = new Client({
   intents: [
@@ -42,14 +34,63 @@ const client = new Client({
   ],
 });
 
-const riffy = new Riffy(client, node, {
+// Fix riffy bug: voice object includes `event: null` which Lavalink v4 rejects (400).
+// Monkey-patch the prototype before any players are created so every player gets
+// the clean voice payload { token, endpoint, sessionId } only.
+const { Connection } = require("riffy/build/structures/Connection");
+Connection.prototype.updatePlayerVoiceData = function () {
+  // Skip voice-only PATCHes when the player hasn't started playing yet.
+  // Lavalink rejects PATCH on a player that doesn't exist server-side.
+  // syncVoiceAndPlay() will create the player with voice+track together.
+  if (!this.player.current && !this.player.playing) return;
+  const { sessionId, endpoint, token } = this.voice;
+  // Lavalink 4.2.2 requires channelId in the voice object
+  const channelId = this.player.voiceChannel ?? null;
+  this.player.node.rest.updatePlayer({
+    guildId: this.player.guildId,
+    data: {
+      voice: { sessionId, endpoint, token, channelId },
+      volume: this.player.volume,
+    },
+  });
+};
+
+// Some Lavalink forks reject ?noReplace=false with 400. Remove it — the default
+// behavior (replace current track) matches noReplace=false anyway.
+const { Rest } = require("riffy/build/structures/Rest");
+const _origUpdatePlayer = Rest.prototype.updatePlayer;
+Rest.prototype.updatePlayer = function (options: {
+  guildId: string;
+  data: unknown;
+}) {
+  const origMakeRequest = this.makeRequest.bind(this);
+  this.makeRequest = (
+    method: string,
+    endpoint: string,
+    body: unknown,
+    includeHeaders?: boolean,
+  ) =>
+    origMakeRequest(
+      method,
+      endpoint.replace("?noReplace=false", ""),
+      body,
+      includeHeaders,
+    );
+  const result = _origUpdatePlayer.call(this, options);
+  this.makeRequest = origMakeRequest;
+  return result;
+};
+
+const riffy = new Riffy(client, [node], {
   send: (payload) => {
     const guild = client.guilds.cache.get(payload.d.guild_id);
     if (guild) guild.shard.send(payload);
   },
   defaultSearchPlatform: process.env.SEARCH_PLATFORM,
   restVersion: "v4",
-  bypassChecks: { nodeFetchInfo: false },
+  bypassChecks: {
+    nodeFetchInfo: false,
+  },
 });
 
 const commands = new Collection<string, Command>();
@@ -104,7 +145,7 @@ riffyEvents.forEach((file) => {
   const filePath = path.join(riffyPath, file);
   const { default: event } = require(filePath);
   console.log(event);
-  bot.riffy.on(event.name, (...args) => {
+  bot.riffy.on(event.name, (...args: unknown[]) => {
     console.log(event.name);
     if (event.name === "raw") console.log(args);
     event.execute(...args);
@@ -113,11 +154,41 @@ riffyEvents.forEach((file) => {
 
 bot.client.on("raw", (d) => {
   if (
-    ![
+    [
       GatewayDispatchEvents.VoiceStateUpdate,
       GatewayDispatchEvents.VoiceServerUpdate,
     ].includes(d.t)
-  )
-    return;
-  bot.riffy.updateVoiceState(d);
+  ) {
+    console.log(`[Voice] Raw event received: ${d.t}`, JSON.stringify(d.d));
+    bot.riffy.updateVoiceState(d);
+  }
 });
+
+// Temporary diagnostics: log detailed voice/connection debug info
+
+(bot.riffy as any).on("debug", (msg: string) => {
+  if (
+    msg.includes("voice") ||
+    msg.includes("Voice") ||
+    msg.includes("CONNECTION") ||
+    msg.includes("Rest")
+  ) {
+    console.log("[Riffy Debug]", msg);
+  }
+});
+
+// Catch track errors that are otherwise silently dropped
+bot.riffy.on(
+  RiffyEventType.TrackError,
+  (player: Player, track: Track, payload: unknown) => {
+    console.error("[trackError]", JSON.stringify(payload));
+  },
+);
+
+// Catch WebSocket close events (e.g. voice region issues, bot kicked from VC)
+bot.riffy.on(
+  RiffyEventType.SocketClosed,
+  (player: Player, payload: unknown) => {
+    console.warn("[socketClosed]", JSON.stringify(payload));
+  },
+);
